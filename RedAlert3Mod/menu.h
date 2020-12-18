@@ -12,6 +12,13 @@ namespace ra3
 	class cmenu
 	{
 	public:
+		struct item_t
+		{
+			std::string text;
+			std::vector<std::string> statements;
+			std::uint32_t state;
+		};
+
 		static void render(CONST LPDIRECT3DDEVICE9 pDevice);
 
 		static void assign(main::fnPresent_t& mPresent);

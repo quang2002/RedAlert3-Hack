@@ -27,7 +27,7 @@
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="drawing.cpp">
-      <Filter>RA3</Filter>
+      <Filter>Drawing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +41,8 @@
     <ClInclude Include="menu.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="drawing.h" />
+    <ClInclude Include="drawing.h">
+      <Filter>Drawing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

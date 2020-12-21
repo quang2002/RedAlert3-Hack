@@ -51,7 +51,7 @@ DWORD RA3XAPI ra3::main::engine(LPVOID)
 		DWORD oldProtect;
 		if (buffer && VirtualProtect(present, 5, PAGE_EXECUTE_READWRITE, &oldProtect))
 		{
-			ra3::cmenu::assign(mPresent);
+			ra3::render_t::assign(mPresent);
 			memcpy(buffer, present, 5);
 			make_jmp(buffer + 5, (BYTE*)((DWORD)present + 5), 5);
 			make_jmp(present, (BYTE*)mPresent, 5);

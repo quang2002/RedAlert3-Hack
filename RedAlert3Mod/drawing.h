@@ -44,6 +44,9 @@ namespace directx
 		circle_t();
 		circle_t(std::uint32_t x, std::uint32_t y, std::uint32_t radius, D3DCOLOR color, D3DCOLOR border_color = eColor::None, std::uint32_t thickness = 1);
 
+		void set_position(std::uint32_t x, std::uint32_t y);
+		void set_radius(std::uint32_t radius);
+
 		friend LPDIRECT3DDEVICE9 operator << (LPDIRECT3DDEVICE9 device, const circle_t& circle);
 	};
 }

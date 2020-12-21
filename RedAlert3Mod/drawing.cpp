@@ -150,4 +150,15 @@ directx::circle_t::circle_t(std::uint32_t x, std::uint32_t y, std::uint32_t radi
 {
 }
 
+void directx::circle_t::set_position(std::uint32_t x, std::uint32_t y)
+{
+	this->x = x;
+	this->y = y;
+}
+
+void directx::circle_t::set_radius(std::uint32_t radius)
+{
+	this->radius = radius;
+}
+
 

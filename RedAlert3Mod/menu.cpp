@@ -4,17 +4,58 @@ HHOOK ra3::render_t::menu_t::hhook = NULL;
 
 std::vector<ra3::render_t::menu_t*> menu_ins;
 
+directx::font_t consolas("consolas", 14, 6, FW_NORMAL, FALSE);
+
+struct {
+	std::uint32_t unlimitedCoin, unlimitedEnergy;
+}vars;
+
 void ra3::render_t::render(const LPDIRECT3DDEVICE9 pDevice)
 {
+	consolas.init(pDevice);
+
+	static bool isShow = false;
 	static menu_t* menu = new menu_t(20, 20, 300, 0, 20, 5);
 	if (menu->items.size() == 0)
 	{
-		menu->add("1", NULL, { "", "" });
-		menu->add("2", NULL, { "", "" });
-		menu->add("3", NULL, { "", "" });
-		menu->add("4", NULL, { "", "" });
+		menu->add("Unlimited Coin", &vars.unlimitedCoin, { "OFF", "ON" });
+		menu->add("Unlimited Energy", &vars.unlimitedEnergy, { "OFF", "ON" });
 	}
-	menu->render(pDevice);
+
+	if (vars.unlimitedCoin)
+	{
+		std::size_t(__thiscall * sub_00848170)(DWORD*) = decltype(sub_00848170)(0x00848170);
+		std::size_t(__thiscall * sub_0084AA90)(DWORD*, UINT) = decltype(sub_0084AA90)(0x0084AA90);
+
+		DWORD* ptr_this = *(DWORD**)(ra3::main::vars.game + 0x8FC734);
+		ptr_this = (DWORD*)sub_00848170(ptr_this);
+		ptr_this = (DWORD*)sub_0084AA90(ptr_this, NULL);
+		if (ptr_this)
+		{
+			*(ptr_this + 1) = 99999999;
+		}
+	}
+
+	if (vars.unlimitedEnergy)
+	{
+		DWORD* ptr_this = *(DWORD**)(ra3::main::vars.game + 0x8FC734);
+
+		auto load_ptr = [](DWORD base, std::vector<DWORD> offsets) -> DWORD*
+		{
+			for (const auto& offset : offsets)
+			{
+				if (&offset == offsets.end()._Ptr) return (DWORD*)(base + offset);
+				base = *(DWORD*)(base + offset);
+				if (!base) return NULL;
+			}
+		};
+
+		ptr_this = load_ptr((DWORD)ptr_this, { 0x28, 0xC, 0x6C, 0x4 });
+		*ptr_this = 9999999;
+	}
+
+	if (GetAsyncKeyState(VK_F4) & 1) isShow = !isShow;
+	if (isShow) menu->render(pDevice);
 }
 
 void ra3::render_t::assign(main::fnPresent_t& mPresent)
@@ -84,11 +125,30 @@ void ra3::render_t::menu_t::render(const LPDIRECT3DDEVICE9 pDevice)
 	h = items.size() * (item_height + item_offset) + item_offset;
 	pDevice << rectangle_t(x, y, w, h, 0x40404040, eColor::White);
 
+	POINT mpos;
+	GetCursorPos(&mpos);
+	ScreenToClient(GetForegroundWindow(), &mpos);
+
+	auto inArea = [&mpos](std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h) {
+		return mpos.x >= x && mpos.x <= x + w && mpos.y >= y && mpos.y <= y + h;
+	};
+
 	std::size_t index = 0;
 	for (const auto& item : items)
 	{
 		std::uint32_t item_y = index * (item_height + item_offset);
-		pDevice << rectangle_t(x + 5, y + item_offset + item_y, w - 10, item_height, 0x20FFFFFF, eColor::Green);
+		if (inArea(x + 5, y + item_offset + item_y, w - 10, item_height))
+		{
+			pDevice << rectangle_t(x + 5, y + item_offset + item_y, w - 10, item_height, 0x20FFFFFF, eColor::Blue);
+			if (GetAsyncKeyState(VK_LBUTTON) & 1 && GetAsyncKeyState(VK_LBUTTON) < 0)
+			{
+				++(*item.pchoice);
+				if (*item.pchoice == item.statements.size()) *item.pchoice = 0;
+			}
+		}
+		else pDevice << rectangle_t(x + 5, y + item_offset + item_y, w - 10, item_height, 0x20FFFFFF, eColor::Green);
+		consolas.write(x + 10, y + item_offset * 1.5f + item_y, eColor::White, DT_LEFT | DT_NOCLIP, item.text);
+		consolas.write(x + w - 10, y + item_offset * 1.5f + item_y, eColor::White, DT_RIGHT | DT_NOCLIP, item.statements[*item.pchoice]);
 		++index;
 	}
 }

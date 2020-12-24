@@ -49,6 +49,28 @@ namespace directx
 
 		friend LPDIRECT3DDEVICE9 operator << (LPDIRECT3DDEVICE9 device, const circle_t& circle);
 	};
+
+	class font_t
+	{
+		std::string font_family;
+		std::uint32_t font_height;
+		std::uint32_t font_width;
+		std::uint32_t font_weight;
+		std::uint32_t italic;
+
+		LPD3DXFONT font;
+	public:
+		font_t();
+		font_t(std::string font_family, std::uint32_t font_height, std::uint32_t font_width, std::uint32_t font_weight, std::uint32_t italic);
+
+		~font_t();
+
+		bool init(LPDIRECT3DDEVICE9 pDevice);
+
+		bool release();
+
+		void write(std::uint32_t x, std::uint32_t y, D3DCOLOR color, std::uint32_t flags, std::string text, ...);
+	};
 }
 
 #endif // !__DRAWING_H__

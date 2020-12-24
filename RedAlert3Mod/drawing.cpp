@@ -161,4 +161,56 @@ void directx::circle_t::set_radius(std::uint32_t radius)
 	this->radius = radius;
 }
 
+/*
+* class font_t:
+*	5 attributes:
+*		font_family
+*		height, width, weight
+*		italic
+*/
 
+directx::font_t::font_t()
+{
+}
+
+directx::font_t::font_t(std::string font_family, std::uint32_t font_height, std::uint32_t font_width, std::uint32_t font_weight, std::uint32_t italic) :
+	font_family(font_family), font_height(font_height), font_width(font_width), font_weight(font_weight), italic(italic)
+{
+}
+
+directx::font_t::~font_t()
+{
+	this->release();
+}
+
+bool directx::font_t::init(LPDIRECT3DDEVICE9 pDevice)
+{
+	if (font) return false;
+	return SUCCEEDED(D3DXCreateFontA(pDevice, font_height, font_width, font_weight, 1, italic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, font_family.c_str(), &font));
+}
+
+bool directx::font_t::release()
+{
+	if (font)
+	{
+		font->Release();
+		font = NULL;
+		return true;
+	}
+	return false;
+}
+
+void directx::font_t::write(std::uint32_t x, std::uint32_t y, D3DCOLOR color, std::uint32_t flags, std::string text, ...)
+{
+	RECT rect = { x,y,x,y };
+	char buffer[1024] = { 0 };
+
+	const char* c_text = text.c_str();
+
+	va_list ap;
+	va_start(ap, c_text);
+	vsprintf_s(buffer, sizeof(buffer), c_text, ap);
+	va_end(ap);
+
+	font->DrawTextA(NULL, buffer, -1, &rect, flags, color);
+}
